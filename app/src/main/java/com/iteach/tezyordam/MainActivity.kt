@@ -5,11 +5,14 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.iteach.tezyordam.adapter.AdapterRecyclerOrders
 import com.iteach.tezyordam.base.Person
 import com.iteach.tezyordam.databinding.ActivityMainBinding
 import com.mindorks.ridesharing.utils.PermissionUtils
@@ -19,24 +22,35 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.StringBuilder
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListner {
     private val personCollectRef = Firebase.firestore.collection("persons")
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 999
     var _binding: ActivityMainBinding? = null
     val binding get() = _binding!!
-    var number = 0
+    lateinit var ordersAdapter: AdapterRecyclerOrders
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.buttonSend.setOnClickListener {
+        binding.apply {
 
-//            savePerson(Person("First Name $number","Last Name $number"))
-//            number++
-            startActivity(Intent(this,MapsActivity::class.java))
+            recyclerOrders.layoutManager = LinearLayoutManager(
+                this@MainActivity,
+                LinearLayoutManager.VERTICAL, false
+            )
+
+            ordersAdapter = AdapterRecyclerOrders(this@MainActivity, arrayListOf(),this@MainActivity)
+            recyclerOrders.adapter = ordersAdapter
         }
+//        binding.buttonSend.setOnClickListener {
+//
+////            savePerson(Person("First Name $number","Last Name $number"))
+////            number++
+//            startActivity(Intent(this,MapsActivity::class.java))
+//        }
 
         realtimeUpdates()
         grandedPermission()
@@ -68,14 +82,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
     private fun realtimeUpdates(){
         personCollectRef.addSnapshotListener { value, error ->
             value.let {
                 if (it!=null){
                     for (document in it.documents){
-                        binding.firstName.text = "${document.toObject<Person>()?.firstName.toString()} \n ${binding.firstName.text}"
+
                     }
+                    binding.linearProgress.visibility = View.GONE
                 }
 
             }
@@ -112,5 +126,9 @@ class MainActivity : AppCompatActivity() {
         withContext(Dispatchers.Main){
             Toast.makeText(this@MainActivity,"success",Toast.LENGTH_LONG).show()
         }
+    }
+
+    override fun orderClicked(order: Int) {
+        startActivity(Intent(this,MapsActivity::class.java))
     }
 }

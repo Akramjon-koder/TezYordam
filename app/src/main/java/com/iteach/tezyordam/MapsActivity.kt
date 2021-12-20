@@ -4,6 +4,8 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Looper
@@ -11,6 +13,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -20,13 +23,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.iteach.tezyordam.base.LocationBase
-import com.iteach.tezyordam.base.Person
 import com.iteach.tezyordam.databinding.ActivityMapsBinding
 import com.iteach.tezyordam.utils.Constants
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +41,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     lateinit var fusetLocatonProviderClient: FusedLocationProviderClient
     private val personCollectRef = Firebase.firestore.collection("where")
+    private var icon: Marker? = null
 
     val locationCallback = object : LocationCallback(){
         override fun onLocationResult(result: LocationResult) {
@@ -48,10 +50,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 for (location in locations){
                     if (location!=null){
                         saveLocation(LocationBase(location.latitude,location.longitude))
-                        //Toast.makeText(this@MapsActivity,location.toString(),Toast.LENGTH_LONG).show()
+                        val myLocation = LatLng(location.latitude,location.longitude)
+
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 16F), 500, null)
+                        //mMap.addMarker(MarkerOptions().position(myLocation).title("Marker in Sydney"))
+                        if (icon==null){
+                            icon = mMap.addMarker(
+                                MarkerOptions().position(myLocation)
+                                    .icon(bitmapDescriptorFromVector(R.drawable.ic_ambulance))
+                                    .anchor(0.5f, 1f))
+                        }else{
+                            icon?.setPosition(myLocation)
+                        }
+
+
                     }
                 }
             }
+        }
+    }
+
+    private fun bitmapDescriptorFromVector(vectorResId: Int): BitmapDescriptor? {
+        return ContextCompat.getDrawable(this, vectorResId)?.run {
+            setBounds(0, 0, intrinsicWidth, intrinsicHeight)
+            val bitmap =
+                Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
+            draw(Canvas(bitmap))
+            BitmapDescriptorFactory.fromBitmap(bitmap)
         }
     }
 
@@ -100,9 +125,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-
         inits()
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -122,9 +144,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+//        val sydney = LatLng(-34.0, 151.0)
+//        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
     override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
