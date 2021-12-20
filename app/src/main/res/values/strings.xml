@@ -1,0 +1,4 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">TezYordam</string>
+    <string name="title_activity_maps" tools:ignore="ExtraTranslation">MapsActivity</string>
+</resources>
