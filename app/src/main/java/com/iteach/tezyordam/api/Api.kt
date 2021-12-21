@@ -9,7 +9,18 @@ interface Api {
     @FormUrlEncoded
     fun getLogin(
         @Field("username") username: String,
-        @Field("password") pass: String): Observable<BaseResponse<LoginModel>>
+        @Field("password") pass: String): Observable<BaseResponse>
+
+
+    @GET("/api/order/update")
+    fun getupdate(
+        @Query("id") id: Int,
+        @Query("doctor_id") doctor_id: Int,
+        @Query("arrived_at") arrived_at: String,
+        @Query("finished_at") finished_at: String,
+    ): Observable<BaseResponse>
+
+
 
 }
 

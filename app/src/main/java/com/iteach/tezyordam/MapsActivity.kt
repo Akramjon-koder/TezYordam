@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -27,6 +28,8 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.iteach.taxi.viewmodel.MyViewModel
+import com.iteach.tezyordam.base.ComplitModel
 import com.iteach.tezyordam.base.LocationBase
 import com.iteach.tezyordam.databinding.ActivityMapsBinding
 import com.iteach.tezyordam.utils.Constants
@@ -34,6 +37,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -43,6 +48,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private val personCollectRef = Firebase.firestore.collection("where")
     private var ambulance: Marker? = null
     private var icon: Marker? = null
+    lateinit var viewModel: MyViewModel
 
     val locationCallback = object : LocationCallback(){
         override fun onLocationResult(result: LocationResult) {
@@ -63,7 +69,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         }else{
                             ambulance?.setPosition(myLocation)
                         }
-
 
                     }
                 }
@@ -86,8 +91,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             val doc = System.currentTimeMillis().toString()
                 Firebase.firestore
                 .collection("completed")
-                .document(doc)
-                .set(hashMapOf("phone" to phone,"id" to doc))
+                .document("doc")
+                .set(ComplitModel(phone,doc))
+                    .addOnSuccessListener {
+                        finish()
+                    }
 //                .addOnSuccessListener {
 //                    Toast.makeText(this@MapsActivity,"success",Toast.LENGTH_LONG).show()
 //                }
@@ -145,6 +153,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
         inits()
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -158,7 +168,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         binding.completedButton.setOnClickListener {
             sendCompleted(intent.getStringExtra("phone"))
+            sendComplete()
         }
+    }
+
+    private fun sendComplete() {
+        val formatter = SimpleDateFormat("hh:mm")
+        val calendar = Calendar.getInstance()
+
+        val time = intent.getLongExtra("time",0)
+        val date2 = formatter.format(calendar.getTime()).toString()
+        calendar.timeInMillis = time
+
+        val date = formatter.format(calendar.getTime()).toString()
+
+        viewModel.sendLogin(date,date2,this)
+        viewModel.success.observe(this,{
+            //Toast.makeText(this,"saqlandi",Toast.LENGTH_LONG).show()
+        })
     }
 
     @SuppressLint("VisibleForTests")

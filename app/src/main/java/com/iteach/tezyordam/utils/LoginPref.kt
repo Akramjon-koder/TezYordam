@@ -1,14 +1,15 @@
 package com.iteach.tezyordam.utils
 
+import com.iteach.taxi.fragment.login.base.LoginModel
 import io.paperdb.Paper
 
 object LoginPref {
     private const val  login ="fdjnbds"
-     fun SaveLogin(model: Int){
+     fun SaveLogin(model: LoginModel){
          Paper.book().write(login,model)
      }
-    fun ReadLogin() : Int{
-        return Paper.book().read(login, 0)
+    fun ReadLogin() : LoginModel{
+        return Paper.book().read(login, LoginModel())
     }
 
 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.iteach.tezyordam.databinding.ActivityLoginBinding
 import com.iteach.tezyordam.databinding.ActivityMainBinding
+import com.iteach.tezyordam.utils.LoginPref
 
 class LoginActivity : AppCompatActivity() {
     var _binding: ActivityLoginBinding? = null
@@ -18,5 +19,7 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this,MainActivity::class.java))
             finish()
         }
+
+        //if(LoginPref.ReadLogin())
     }
 }

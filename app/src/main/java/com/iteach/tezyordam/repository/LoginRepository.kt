@@ -16,20 +16,19 @@ class LoginRepository {
     val compositeDisposible = CompositeDisposable()
     fun sendLogin(
         error: MutableLiveData<String>,
-        success: MutableLiveData<LoginModel>,
-        logginpassword: Login_Password,
+        success: MutableLiveData<Boolean>,
+        timeBegin:String,
+        timeEnd:String,
         requireActivity: Context
     ){
         compositeDisposible.add(
-            NetworkManeger.getApiService(requireActivity).getLogin(logginpassword.username.toString(),logginpassword.password.toString()).
+            NetworkManeger.getApiService(requireActivity).getupdate(1,1,timeBegin,timeEnd).
             subscribeOn(Schedulers.io()).
             observeOn(AndroidSchedulers.mainThread()).
-            subscribeWith(object : DisposableObserver<BaseResponse<LoginModel>>(){
-                override fun onNext(t: BaseResponse<LoginModel>) {
-                    if (t?.success == true) {
-                        success.value = t?.data
-                    } else{
-                        error.value = t?.message
+            subscribeWith(object : DisposableObserver<BaseResponse>(){
+                override fun onNext(t: BaseResponse) {
+                    if (t.status==200){
+                        success.value =true
                     }
                 }
 

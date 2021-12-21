@@ -180,6 +180,8 @@ class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListne
         intent.putExtra("phone",order.phone)
         intent.putExtra("lat",order.latitude)
         intent.putExtra("lon",order.longitude)
+        intent.putExtra("time",order.date)
+
         startActivity(intent)
     }
 
