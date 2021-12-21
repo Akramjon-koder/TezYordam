@@ -83,9 +83,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun sendCompleted(phone: String?) {
         try {
-            val doc =
+            val doc :String=completedCollectRef.document().path
             completedCollectRef
-                .add(hashMapOf("phone" to phone,"id" to completedCollectRef.document()))
+                .document(doc)
+                .set(hashMapOf("phone" to phone,"id" to completedCollectRef.document()))
 //                .addOnSuccessListener {
 //                    Toast.makeText(this@MapsActivity,"success",Toast.LENGTH_LONG).show()
 //                }
