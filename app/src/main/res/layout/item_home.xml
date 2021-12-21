@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/complaint"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/_15sdp"
             android:text="Istima va bosh og'rig'i"
@@ -38,6 +38,8 @@
             android:textColor="#A0A0A0"
             android:textSize="@dimen/_15sdp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/complaint"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/complaint"
             app:layout_constraintTop_toBottomOf="@+id/complaint"
             app:layout_constraintVertical_bias="0.0" />
@@ -55,6 +57,7 @@
             app:layout_constraintVertical_bias="0.0" />
 
         <TextView
+            android:id="@+id/distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_5sdp"
@@ -83,12 +86,13 @@
                 android:id="@+id/timer_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1:56"
+                android:text="11:56"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_22sdp"
                 android:textStyle="bold" />
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="minut"

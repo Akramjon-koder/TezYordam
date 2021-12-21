@@ -13,12 +13,12 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-    <TextView
-        android:id="@+id/location"
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/completed_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
+        android:layout_margin="@dimen/_30sdp"
+        map:icon="@drawable/ic_baseline_check_24"
         map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintStart_toStartOf="parent" />
+        map:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

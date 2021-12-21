@@ -41,6 +41,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     lateinit var fusetLocatonProviderClient: FusedLocationProviderClient
     private val personCollectRef = Firebase.firestore.collection("where")
+    private val completedCollectRef = Firebase.firestore.collection("completed")
     private var icon: Marker? = null
 
     val locationCallback = object : LocationCallback(){
@@ -77,6 +78,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
             draw(Canvas(bitmap))
             BitmapDescriptorFactory.fromBitmap(bitmap)
+        }
+    }
+
+    private fun sendCompleted(phone: String?) {
+        try {
+            val doc =
+            completedCollectRef
+                .add(hashMapOf("phone" to phone,"id" to completedCollectRef.document()))
+//                .addOnSuccessListener {
+//                    Toast.makeText(this@MapsActivity,"success",Toast.LENGTH_LONG).show()
+//                }
+//                .addOnFailureListener {
+//                    Toast.makeText(this@MapsActivity,it.message,Toast.LENGTH_LONG).show()
+//                }
+
+        }catch (e:Exception){
+            Toast.makeText(this@MapsActivity,e.message,Toast.LENGTH_LONG).show()
         }
     }
 
@@ -134,7 +152,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
 
         startCalcilating()
-        realtimeUpdates()
+        //realtimeUpdates()
+
+        binding.completedButton.setOnClickListener {
+            sendCompleted(intent.getStringExtra("phone"))
+        }
     }
 
     @SuppressLint("VisibleForTests")
@@ -160,7 +182,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             value.let {
                 if (it!=null){
                     for (document in it.documents){
-                        binding.location.text =document.toObject<LocationBase>()?.latitude.toString()
+                        document.toObject<LocationBase>()?.latitude.toString()
                     }
                 }
             }
@@ -173,5 +195,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
 
 }

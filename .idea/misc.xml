@@ -6,10 +6,12 @@
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.22604166666666667" />
         <entry key="app/src/main/res/drawable-v24/ic_patient_fast.xml" value="0.22604166666666667" />
         <entry key="app/src/main/res/drawable/ic_ambulance.xml" value="0.38764044943820225" />
+        <entry key="app/src/main/res/drawable/ic_location.xml" value="0.22604166666666667" />
         <entry key="app/src/main/res/drawable/ic_patient.xml" value="0.38764044943820225" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.375" />
         <entry key="app/src/main/res/layout/activity_maps.xml" value="0.375" />
         <entry key="app/src/main/res/layout/item_home.xml" value="0.20572916666666666" />
+        <entry key="app/src/main/res/layout/item_login.xml" value="0.22" />
       </map>
     </option>
   </component>

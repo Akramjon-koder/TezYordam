@@ -1,39 +1,59 @@
 package com.iteach.tezyordam
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.os.CountDownTimer
 import android.view.View
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.iteach.tezyordam.adapter.AdapterRecyclerOrders
-import com.iteach.tezyordam.base.Person
+import com.iteach.tezyordam.base.Order
 import com.iteach.tezyordam.databinding.ActivityMainBinding
 import com.mindorks.ridesharing.utils.PermissionUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListner {
     private val personCollectRef = Firebase.firestore.collection("persons")
 
+    lateinit var fusetLocatonProviderClient: FusedLocationProviderClient
     private val LOCATION_PERMISSION_REQUEST_CODE = 999
     var _binding: ActivityMainBinding? = null
     val binding get() = _binding!!
     lateinit var ordersAdapter: AdapterRecyclerOrders
+    var lastlocation: Location ?= null
+
+    fun startTimer(){
+        val timer = object : CountDownTimer(12000000, 60000) {
+            override fun onTick(millisUntilFinished: Long) {
+                getLocation()
+            }
+            override fun onFinish() {
+            }
+        }
+        timer.start()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        inits()
+        startTimer()
+        getLocation()
 
         binding.apply {
 
@@ -55,7 +75,10 @@ class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListne
         realtimeUpdates()
         grandedPermission()
     }
-
+    @SuppressLint("VisibleForTests")
+    private fun inits() {
+        fusetLocatonProviderClient = FusedLocationProviderClient(this)
+    }
 
     private fun grandedPermission() {
         var permission = true
@@ -78,18 +101,26 @@ class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListne
                 )
             }
         }
-
-
     }
 
     private fun realtimeUpdates(){
         personCollectRef.addSnapshotListener { value, error ->
             value.let {
                 if (it!=null){
+                    var list:ArrayList<Order?> = arrayListOf()
+
                     for (document in it.documents){
+                        val objectitem:Order
+                        if (document.toObject<Order>()!=null){
+                            list.add(document.toObject())
+
+                        }
 
                     }
+
                     binding.linearProgress.visibility = View.GONE
+
+                    ordersAdapter.setData(lastlocation,list)
                 }
 
             }
@@ -103,7 +134,23 @@ class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListne
         }
     }
 
-    private fun savePerson(person: Person) = CoroutineScope(Dispatchers.IO).launch {
+    private fun getLocation(){
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        fusetLocatonProviderClient.lastLocation.addOnSuccessListener {
+            lastlocation = it
+        }
+    }
+
+    private fun saveOrder(person: Order) = CoroutineScope(Dispatchers.IO).launch {
         try {
             personCollectRef
                 .add(person)
@@ -128,7 +175,11 @@ class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListne
         }
     }
 
-    override fun orderClicked(order: Int) {
-        startActivity(Intent(this,MapsActivity::class.java))
+    override fun orderClicked(order: Order) {
+        val intent = Intent(this,MapsActivity::class.java)
+        intent.putExtra("phone",order.phone)
+        startActivity(intent)
     }
+
+
 }
