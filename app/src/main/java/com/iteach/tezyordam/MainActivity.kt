@@ -178,6 +178,8 @@ class MainActivity : AppCompatActivity(),AdapterRecyclerOrders.OnItemClickListne
     override fun orderClicked(order: Order) {
         val intent = Intent(this,MapsActivity::class.java)
         intent.putExtra("phone",order.phone)
+        intent.putExtra("lat",order.latitude)
+        intent.putExtra("lon",order.longitude)
         startActivity(intent)
     }
 

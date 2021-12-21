@@ -36,7 +36,7 @@ class AdapterRecyclerOrders(var orderclick: OnItemClickListner,var items:ArrayLi
             binding.phone.text = items.get(position)?.phone.toString()
             if (currentlocation!=null){
                 Log.e("Location",""+items.get(position)!!.latitude+" "+items.get(position)!!.longitude)
-                binding.distance.text = "${distanse(currentlocation!!.latitude,currentlocation!!.longitude,items.get(position)!!.latitude,items.get(position)!!.longitude).toInt()} km"
+                binding.distance.text = "${distanse(currentlocation!!.latitude,currentlocation!!.longitude,items.get(position)!!.latitude,items.get(position)!!.longitude).toInt()} m"
             }
 
             if (items.get(position)?.condition==1){
@@ -52,7 +52,6 @@ class AdapterRecyclerOrders(var orderclick: OnItemClickListner,var items:ArrayLi
             val calendar = Calendar.getInstance()
 
             binding.timerText.text = formatter.format(calendar.getTime())
-
         }
     }
 
@@ -80,7 +79,7 @@ class AdapterRecyclerOrders(var orderclick: OnItemClickListner,var items:ArrayLi
         dist = rad2deg(dist)
         dist = dist * 60 // 60 nautical miles  per degree of seperation  //Seperatsiya darajasiga 60 dengiz mil
         dist = dist * 1852 // 1820 meters per nautial mile  // Har bir dengiz mili 1820 metr
-        return dist/1000
+        return dist
     }
 
     private fun deg2rad(deg: Double): Double {

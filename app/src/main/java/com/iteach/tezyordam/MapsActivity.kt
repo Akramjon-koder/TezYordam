@@ -41,7 +41,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
     lateinit var fusetLocatonProviderClient: FusedLocationProviderClient
     private val personCollectRef = Firebase.firestore.collection("where")
-    private val completedCollectRef = Firebase.firestore.collection("completed")
+    private var ambulance: Marker? = null
     private var icon: Marker? = null
 
     val locationCallback = object : LocationCallback(){
@@ -55,13 +55,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, 16F), 500, null)
                         //mMap.addMarker(MarkerOptions().position(myLocation).title("Marker in Sydney"))
-                        if (icon==null){
-                            icon = mMap.addMarker(
+                        if (ambulance==null){
+                            ambulance = mMap.addMarker(
                                 MarkerOptions().position(myLocation)
                                     .icon(bitmapDescriptorFromVector(R.drawable.ic_ambulance))
                                     .anchor(0.5f, 1f))
                         }else{
-                            icon?.setPosition(myLocation)
+                            ambulance?.setPosition(myLocation)
                         }
 
 
@@ -83,10 +83,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun sendCompleted(phone: String?) {
         try {
-            val doc :String=completedCollectRef.document().path
-            completedCollectRef
+            val doc = System.currentTimeMillis().toString()
+                Firebase.firestore
+                .collection("completed")
                 .document(doc)
-                .set(hashMapOf("phone" to phone,"id" to completedCollectRef.document()))
+                .set(hashMapOf("phone" to phone,"id" to doc))
 //                .addOnSuccessListener {
 //                    Toast.makeText(this@MapsActivity,"success",Toast.LENGTH_LONG).show()
 //                }
@@ -167,6 +168,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        val lat = intent.getDoubleExtra("lat",0.0)
+        val lon = intent.getDoubleExtra("lon",0.0)
+        if (lat!=0.0&&lon!=0.0){
+            icon = mMap.addMarker(
+                MarkerOptions().position(LatLng(lat,lon))
+                    .icon(bitmapDescriptorFromVector(R.drawable.ic_patient_fast))
+                    .anchor(0.5f, 1f))
+        }
+
 //        val sydney = LatLng(-34.0, 151.0)
 //        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
